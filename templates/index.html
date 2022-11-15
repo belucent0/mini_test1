@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta property="og:title" content="아이유 팬명록"/>
+    <meta property="og:description" content="응원 한 마디 남기고 가세요!"/>
+    <meta property="og:image" content="https://img.gqkorea.co.kr/gq/2022/08/style_63073140eea70.jpg"/>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+
+    <title>길드원 방명록</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700;900&display=swap"
+          rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Noto Serif KR', serif;
+        }
+
+        .mypic {
+            width: 100%;
+            height: 300px;
+
+            background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url('https://velog.velcdn.com/images%2Fdbfudgudals%2Fpost%2F9d83adaf-334a-49c8-aa4f-720071f6a8f7%2Fimage.png');
+            background-position: center 30%;
+            background-size: cover;
+
+            color: white;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mypost {
+            width: 95%;
+            max-width: 500px;
+            margin: 20px auto 20px auto;
+
+            box-shadow: 0px 0px 3px 0px black;
+            padding: 20px;
+        }
+
+        .mypost > button {
+            margin-top: 15px;
+        }
+
+        .mycards {
+            width: 95%;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .mycards > .card {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+
+
+
+
+        * {
+            font-family: 'Gowun Batang', serif;
+            color: white;
+        }
+
+        body {
+            background-image: linear-gradient(5deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)), url('https://img.freepik.com/premium-photo/white-cloth-texture-background-abstract-white-background_9635-4079.jpg?w=1380');
+            background-position: center;
+            background-size: cover;
+        }
+
+        h1 {
+            font-weight: bold;
+        }
+
+        .order {
+            width: 500px;
+            margin: 60px auto 0px auto;
+            padding-bottom: 60px;
+        }
+
+        .mybtn {
+            width: 100%;
+        }
+
+        .order > table {
+            margin: 40px 0;
+            font-size: 18px;
+        }
+
+        option {
+            color: black;
+        }
+
+
+    </style>
+    <script>
+        $(document).ready(function () {
+            set_temp()
+            show_comment()
+        });
+
+        function set_temp() {
+            $.ajax({
+                type: "GET",
+                url: "http://spartacodingclub.shop/sparta_api/weather/seoul",
+                data: {},
+                success: function (response) {
+                    $('#temp').text(response['temp'])
+                }
+            })
+        }
+
+        function save_comment() {
+            let name = $('#name').val()
+            let comment = $('#comment').val()
+
+            $.ajax({
+                type: 'POST',
+                url: '/guestbook',
+                data: {name_give: name, comment_give: comment},
+                success: function (response) {
+                    alert(response["msg"])
+                    window.location.reload()
+                }
+            })
+        }
+
+        function show_comment() {
+            $.ajax({
+                type: "GET",
+                url: "/guestbook",
+                data: {},
+                success: function (response) {
+                    let rows = response['comment']
+                    for ( i = 0; i < rows.length; i ++) {
+                        let name = rows[i]['name']
+                        let comment = rows[i]['comment']
+
+                        let temp_html = `<div class="card">
+                                            <div class="card-body">
+                                                <blockquote class="blockquote mb-0">
+                                                    <p>${comment}</p>
+                                                    <footer class="blockquote-footer">${name}</footer>
+                                                </blockquote>
+                                            </div>
+                                        </div>`
+                        $('#comment-list').append(temp_html)
+                    }
+                }
+            });
+        }
+
+
+
+
+
+        $(document).ready(function () {
+            show_order();
+        });
+
+        function show_order() {
+            $.ajax({
+                type: 'GET',
+                url: '/joins',
+                data: {},
+                success: function (response) {
+                    let rows = response['orders']
+                    for (let i = 0; i < rows.length; i ++){
+                        let nickname = rows[i]['nickname']
+                        let job = rows[i]['job']
+                        let self = rows[i]['self']
+
+
+                        let temp_html = `<tr>
+                                            <td>${nickname}</td>
+                                            <td>${job}</td>
+                                            <td>${self}</td>
+                                        </tr>`
+                        $('#order-box').append(temp_html)
+                    }
+                }
+            });
+        }
+
+        function save_order() {
+            let nickname = $('#nickname').val()
+            let job = $('#job').val()
+            let self = $('#self').val()
+
+
+            $.ajax({
+                type: 'POST',
+                url: '/joins',
+                data: {nickname_give: nickname, job_give: job, self_give: self},
+                success: function (response) {
+                    alert(response['msg'])
+                    window.location.reload()
+                }
+            });
+        };
+
+
+
+
+    </script>
+</head>
+<body>
+<div class="mypic">
+    <h1>Dev9Team 길드: 방명록 & 가입 신청</h1>
+    <p>현재기온: <span id="temp">36</span>도</p>
+</div>
+<div class="mypost">
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="name" placeholder="url">
+        <label for="floatingInput">닉네임</label>
+    </div>
+    <div class="form-floating">
+<textarea class="form-control" placeholder="Leave a comment here" id="comment"
+          style="height: 100px"></textarea>
+        <label for="floatingTextarea2">방명록 작성</label>
+    </div>
+    <button onclick="save_comment()" type="button" class="btn btn-dark">방명록 남기기</button>
+</div>
+<div class="mycards" id="comment-list">
+</div>
+
+
+<div class="mask"></div>
+<div class="order">
+    <h1>Dev9Team 길드원 상시 모집!</h1>
+    <h3>지원자격: 개발 입문자</h3>
+    <p>
+        개발 입문자라면<br/>
+        직업 제한 없이 길드원이 될 수 있다고?<br/>
+        5개월 만에 개발 기술도 함께 배우는 성장형 길드 활동!
+    </p>
+    <div class="order-info">
+        <div class="input-group mb-3">
+            <span class="input-group-text">닉네임</span>
+            <input id="nickname" type="text" class="form-control">
+        </div>
+        <div class="input-group mb-3">
+            <label class="input-group-text" for="job">직업 선택</label>
+            <select class="form-select" id="job">
+                <option selected>-- 선택 하기 --</option>
+                <option value="전사">전사</option>
+                <option value="마법사">마법사</option>
+                <option value="궁수">궁수</option>
+                <option value="도적">도적</option>
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text">한 줄 소개</span>
+            <input id="self" type="text" class="form-control">
+        </div>
+
+        <button onclick="save_order()" type="button" class="btn btn-warning mybtn">길드 가입 신청</button>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">닉네임</th>
+            <th scope="col">직업선택</th>
+            <th scope="col">한 줄 소개</th>
+
+        </tr>
+        </thead>
+        <tbody id="order-box">
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+</body>
+</html>
